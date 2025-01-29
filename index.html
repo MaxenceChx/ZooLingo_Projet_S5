@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZooLingo - Le zoo des langues</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://api.iconify.design/fluent-emoji:lion.svg" type="image/svg+xml">
+</head>
+<body>
+    <button class="quit-button" id="quitButton" style="display: none;">Quitter</button>
+
+    <div class="container">
+        <div id="homeScreen" class="home-screen active">
+            <header class="app-header">
+                <div class="logo-container">
+                    <img src="https://api.iconify.design/fluent-emoji:lion.svg" alt="Logo" class="logo-icon">
+                    <h1>ZooLingo</h1>
+                </div>
+                <p class="app-description">Explorez le monde des animaux en plusieurs langues ! 🦁🌍</p>
+            </header>
+
+            <div class="language-selector">
+                <p class="language-title">Sélectionnez votre langue d'exploration :</p>
+                <div class="flags-container">
+                    <button class="flag-button selected" data-lang="fr">
+                        <img src="https://api.iconify.design/circle-flags:fr.svg" alt="Français" title="Français">
+                        <span class="flag-label">Français</span>
+                    </button>
+                    <button class="flag-button" data-lang="en">
+                        <img src="https://api.iconify.design/circle-flags:us.svg" alt="English" title="English">
+                        <span class="flag-label">English</span>
+                    </button>
+                    <button class="flag-button" data-lang="es">
+                        <img src="https://api.iconify.design/circle-flags:es.svg" alt="Español" title="Español">
+                        <span class="flag-label">Español</span>
+                    </button>
+                    <button class="flag-button" data-lang="de">
+                        <img src="https://api.iconify.design/circle-flags:de.svg" alt="Deutsch" title="Deutsch">
+                        <span class="flag-label">Deutsch</span>
+                    </button>
+                    <button class="flag-button" data-lang="it">
+                        <img src="https://api.iconify.design/circle-flags:it.svg" alt="Italiano" title="Italiano">
+                        <span class="flag-label">Italiano</span>
+                    </button>
+                    <button class="flag-button" data-lang="ja">
+                        <img src="https://api.iconify.design/circle-flags:jp.svg" alt="日本語" title="日本語">
+                        <span class="flag-label">日本語</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modes-container">
+                <h2 class="modes-title">Choisissez votre aventure</h2>
+                <div class="mode-buttons">
+                    <button class="mode-button" id="learnButton">
+                        <img src="https://api.iconify.design/fluent-emoji:owl.svg" alt="Learn" class="mode-icon">
+                        <div class="mode-info">
+                            <span class="mode-name">Explorer</span>
+                            <span class="mode-description">Découvrez les animaux et leur nom</span>
+                        </div>
+                    </button>
+                    <button class="mode-button" id="quizButton">
+                        <img src="https://api.iconify.design/fluent-emoji:tiger.svg" alt="Quiz" class="mode-icon">
+                        <div class="mode-info">
+                            <span class="mode-name">Safari Quiz</span>
+                            <span class="mode-description">Testez vos connaissances</span>
+                        </div>
+                    </button>
+                    <button class="mode-button" id="speakButton">
+                        <img src="https://api.iconify.design/fluent-emoji:parrot.svg" alt="Speak" class="mode-icon">
+                        <div class="mode-info">
+                            <span class="mode-name">Prononciation</span>
+                            <span class="mode-description">Entraînez votre prononciation</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3 class="footer-title">🌟 Caractéristiques</h3>
+                        <ul class="feature-grid">
+                            <li>🎯 3 modes de jeu</li>
+                            <li>🗣️ Reconnaissance vocale</li>
+                            <li>🌍 6 langues disponibles</li>
+                            <li>📱 Compatible mobile</li>
+                            <li>🏆 Système de score</li>
+                        </ul>
+                    </div>
+            
+                    <div class="footer-section stats-section">
+                        <h3 class="footer-title">📊 Statistiques</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number">102</span>
+                                <span class="stat-label">Animaux</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">6</span>
+                                <span class="stat-label">Langues</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">612</span>
+                                <span class="stat-label">Mots</span>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="footer-section">
+                        <h3 class="footer-title">🦁 Aperçu</h3>
+                        <div class="animals-preview">
+                            <img src="https://api.iconify.design/fluent-emoji:elephant.svg" alt="Éléphant" class="preview-icon">
+                            <img src="https://api.iconify.design/fluent-emoji:penguin.svg" alt="Pingouin" class="preview-icon">
+                            <img src="https://api.iconify.design/fluent-emoji:butterfly.svg" alt="Papillon" class="preview-icon">
+                            <img src="https://api.iconify.design/fluent-emoji:giraffe.svg" alt="Girafe" class="preview-icon">
+                            <img src="https://api.iconify.design/fluent-emoji:tiger.svg" alt="Tigre" class="preview-icon">
+                            <img src="https://api.iconify.design/fluent-emoji:owl.svg" alt="Hibou" class="preview-icon">
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div id="learnScreen" class="learn-screen">
+            <div id="cardContainer" class="card"></div>
+        </div>
+
+        <div id="quizScreen" class="quiz-screen">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div id="quizContainer" class="quiz-container"></div>
+        </div>
+
+        <div id="speakScreen" class="speak-screen">
+            <div class="score">Score: <span id="speakScore">0</span></div>
+            <div id="speakCardContainer" class="card"></div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
