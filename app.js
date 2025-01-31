@@ -290,13 +290,30 @@ class VocabApp {
 
     /**
      * Définit la langue actuelle de l'application
-     * @param {string} lang - La langue à définir (fr, en, es, de, it, ja)
+     * @param {string} lang - La langue à définir
      */
     setLanguage(lang) {
         this.currentLanguage = lang;
         document.querySelectorAll('.flag-button').forEach(button => {
             button.classList.toggle('selected', button.dataset.lang === lang);
         });
+
+        // Gestion du warning sur mobile
+        if (window.innerWidth <= 768) {
+            const warningElement = document.getElementById('languageWarning');
+            if (warningElement) {
+                if (lang !== 'fr') {
+                    warningElement.style.display = 'block';
+                    // Retourner automatiquement en français après 3 secondes
+                    setTimeout(() => {
+                        this.setLanguage('fr');
+                        warningElement.style.display = 'none';
+                    }, 3000);
+                } else {
+                    warningElement.style.display = 'none';
+                }
+            }
+        }
     }
 
     /**
@@ -494,7 +511,7 @@ class VocabApp {
      * Démarre une nouvelle question dans le quiz
      */
     startNewQuestion() {
-        if (this.questionsCount >= 20) {
+        if (this.questionsCount >= 2) {
             this.showResultScreen();
             return;
         }
@@ -675,47 +692,126 @@ class VocabApp {
     // PARTAGE
 
     /**
-     * Partage le score actuel sur Twitter
+     * Affiche le menu de partage personnalisé
+     * @param {Object} messages - Les messages pour chaque plateforme
+     * @param {Object} shareData - Les données de partage
      */
-    shareScore() {
-        const isPronounciation = document.querySelector('.speak-screen') !== null;
+    showShareMenu(messages, shareData) {
+        const existingMenu = document.querySelector('.share-menu');
+        if (existingMenu) existingMenu.remove();
+
+        const shareMenu = document.createElement('div');
+        shareMenu.className = 'share-menu';
         
-        let langInfo;
-        switch (this.currentLanguage) {
-            case 'fr':
-                langInfo = { flag: '🇫🇷', name: 'Français' };
-                break;
-            case 'en':
-                langInfo = { flag: '🇺🇸', name: 'Anglais' };
-                break;
-            case 'es':
-                langInfo = { flag: '🇪🇸', name: 'Espagnol' };
-                break;
-            case 'de':
-                langInfo = { flag: '🇩🇪', name: 'Allemand' };
-                break;
-            case 'it':
-                langInfo = { flag: '🇮🇹', name: 'Italien' };
-                break;
-            case 'ja':
-                langInfo = { flag: '🇯🇵', name: 'Japonais' };
-                break;
+        const menuContent = `
+            <div class="share-menu-content">
+                <h3>Partager mon score</h3>
+                <div class="share-buttons">
+                    ${navigator.share ? 
+                        `<button data-action="native" class="share-button-native">
+                            <img src="https://api.iconify.design/mdi:share-variant.svg" alt="Share">
+                            Partager via votre appareil
+                        </button>` 
+                    : ''}
+                    <button data-platform="twitter" class="share-button-twitter">
+                        <img src="https://api.iconify.design/mdi:twitter.svg" alt="Twitter">
+                        Twitter
+                    </button>
+                    <button data-platform="linkedin" class="share-button-linkedin">
+                        <img src="https://api.iconify.design/mdi:linkedin.svg" alt="LinkedIn">
+                        LinkedIn
+                    </button>
+                </div>
+                <button class="close-button">Fermer</button>
+            </div>
+        `;
+
+        shareMenu.innerHTML = menuContent;
+
+        shareMenu.querySelectorAll('button[data-platform]').forEach(button => {
+            button.addEventListener('click', () => {
+                const platform = button.dataset.platform;
+                this.openShare(platform, messages[platform] || messages.default, shareData.url);
+            });
+        });
+
+        const nativeButton = shareMenu.querySelector('button[data-action="native"]');
+        if (nativeButton) {
+            nativeButton.addEventListener('click', () => {
+                this.nativeShare(messages.default);
+            });
         }
-        
-        const tweetText = (this.currentScreen == "speak-screen") ? 
-            `🗣️ J'ai obtenu ${this.score}/20 au Quiz de Prononciation en ${langInfo.name} ${langInfo.flag} sur ZooLingo ! Apprenez les animaux en plusieurs langues sur zoolingo.mchaix.fr 🌍` :
-            `🦁 J'ai obtenu ${this.score}/20 au Safari Quiz en ${langInfo.name} ${langInfo.flag} sur ZooLingo ! Apprenez les animaux en plusieurs langues sur zoolingo.mchaix.fr 🌍`;
-        
-        this.shareToTwitter(tweetText);
+
+        shareMenu.querySelector('.close-button').addEventListener('click', () => shareMenu.remove());
+        shareMenu.addEventListener('click', (e) => {
+            if (e.target === shareMenu) shareMenu.remove();
+        });
+
+        document.body.appendChild(shareMenu);
     }
 
     /**
-     * Partage le texte spécifié sur Twitter
+     * Ouvre le lien de partage pour un réseau social spécifique
+     * @param {string} platform - La plateforme de partage
+     * @param {string} text - Le texte à partager
+     * @param {string} [url] - L'URL optionnelle à partager
+     */
+    openShare(platform, text, url = 'https://zoolingo.mchaix.fr') {
+        const urls = {
+            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+            linkedin: `https://www.linkedin.com/feed/?shareActive=true&shareUrl=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+        };
+
+        if (urls[platform]) {
+            window.open(urls[platform], '_blank');
+        }
+    }
+
+    /**
+     * Gère le partage natif via l'API Web Share
      * @param {string} text - Le texte à partager
      */
-    shareToTwitter(text) {
-        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        window.open(tweetUrl, '_blank', 'noopener,noreferrer');
+    nativeShare(text) {
+        navigator.share({
+            title: 'Mon score sur ZooLingo',
+            text: text,
+            url: 'https://zoolingo.mchaix.fr'
+        }).catch(() => {
+            // Ne rien faire en cas d'erreur ou d'annulation
+        });
+    }
+    
+    /**
+     * Partage le score sur les réseaux sociaux
+     */
+    shareScore() {
+        // Configuration des langues
+        const langConfig = {
+            fr: { flag: '🇫🇷', name: 'Français' },
+            en: { flag: '🇺🇸', name: 'Anglais' },
+            es: { flag: '🇪🇸', name: 'Espagnol' },
+            de: { flag: '🇩🇪', name: 'Allemand' },
+            it: { flag: '🇮🇹', name: 'Italien' },
+            ja: { flag: '🇯🇵', name: 'Japonais' }
+        };
+    
+        const langInfo = langConfig[this.currentLanguage];
+        if (!langInfo) return;
+    
+        const shareData = {
+            title: 'Mon score sur ZooLingo',
+            mode: (this.currentScreen === "speak-screen") ? 'Prononciation' : 'Safari Quiz',
+            score: this.score,
+            language: langInfo,
+            url: 'https://zoolingo.mchaix.fr'
+        };
+    
+        const messages = {
+            default: `${shareData.mode === 'Prononciation' ? '🗣️' : '🦁'} J'ai obtenu ${shareData.score}/20 au Quiz de ${shareData.mode} en ${langInfo.name} ${langInfo.flag} sur ZooLingo ! Apprenez les animaux en plusieurs langues sur zoolingo.mchaix.fr 🌍`,
+            linkedin: `Je viens d'obtenir ${shareData.score}/20 au Quiz de ${shareData.mode} en ${langInfo.name} ${langInfo.flag} sur ZooLingo, une application ludique pour apprendre les langues! 🌍`
+        };
+    
+        this.showShareMenu(messages, shareData);
     }
 
     // MODE PRONONCIATION
