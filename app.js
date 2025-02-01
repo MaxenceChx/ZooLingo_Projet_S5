@@ -511,7 +511,7 @@ class VocabApp {
      * Démarre une nouvelle question dans le quiz
      */
     startNewQuestion() {
-        if (this.questionsCount >= 2) {
+        if (this.questionsCount >= 20) {
             this.showResultScreen();
             return;
         }
